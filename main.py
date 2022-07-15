@@ -8,6 +8,17 @@ from bullet import Bullet
 from witch import Witch
 from text import Text
 
+'''
+### TODO:
+### Program witch's attacks 
+### Program collision of witch's attacks
+### Different levels based on witch's HP
+### Program different attack types based on witch's levels
+### Game ending
+### Sounds
+### Refactor code
+'''
+
 class TouhouBootleg:
 	def __init__(self):
 		pygame.init()
