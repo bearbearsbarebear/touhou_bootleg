@@ -10,7 +10,6 @@ from text import Text
 
 '''
 ### TODO:
-### Different levels based on witch's HP
 ### Program different attack types based on witch's levels
 ### Game ending
 ### Sounds
