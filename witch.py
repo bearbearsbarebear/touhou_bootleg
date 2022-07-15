@@ -26,7 +26,7 @@ class Witch(Sprite):
 		self.health = 10
 		self.character_speed = 60 * 0.001
 		self.direction = 0
-		self.fire_rate = 100
+		self.fire_rate = 1000
 		self.attack_cooldown = 0
 		self.action_events = []
 
@@ -61,16 +61,21 @@ class Witch(Sprite):
 		else:
 			self.direction = 1 if (random.randint(0, 1) == 1) else -1
 
-	def do_attack(self):
-		if round(time.time() * 1000) >= self.attack_cooldown:
-			self.attack_cooldown = round(time.time() * 1000) + self.fire_rate
-			self.game._fire_bullet(self, 7)
+	def _phase_events(self):
+		time_ms = round(time.time() * 1000)
 
-	def phase_events(self):
 		# Movement for each phase
 		if self.phase == 1:
 			self._vertical_walking()
-			self.do_attack()
+			if self.attack_cooldown <= time_ms:
+				self._add_event("attack", 7, time_ms)
+				self._add_event("attack", 7, time_ms+50)
+				self._add_event("attack", 7, time_ms+100)
+				self._add_event("attack", 7, time_ms+150)
+				self._add_event("attack", 7, time_ms+200)
+				self._add_event("attack", 7, time_ms+250)
+				self._add_event("attack", 7, time_ms+300)
+				self.attack_cooldown = time_ms + self.fire_rate
 		elif self.phase == 2:
 			self._vertical_walking()
 		elif self.phase == 3:
@@ -79,6 +84,24 @@ class Witch(Sprite):
 			self._vertical_walking()
 		elif self.phase == 5:
 			self._vertical_walking()
+
+	def _add_event(self, etype, info, time):
+		event = {
+			"type": etype,
+			"info": info,
+			"time": time
+		}
+		self.action_events.append(event)
+
+	def _execute_events(self):
+		time_ms = round(time.time() * 1000)
+
+		for event in self.action_events:
+			if event["time"] <= time_ms:
+				if event["type"] == "attack":
+					self.game._fire_bullet(self, event["info"])
+				print("Event popped:", event)
+				self.action_events.remove(event)
 
 	# "Main loop" of the witch's movements, this is called in TouhouBootleg.run_game() at main.py
 	def update(self):
@@ -92,7 +115,8 @@ class Witch(Sprite):
 			else:
 				return print("Game is supposed to end")
 
-		self.phase_events()
+		self._phase_events()
+		self._execute_events()
 
 		self.rect.x = self.x
 		self.rect.y = self.y
