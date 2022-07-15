@@ -22,6 +22,7 @@ class Character:
 		self.moving_south = False
 
 		# Character Info
+		self.name = "Blue Witch"
 		self.health = 100
 		self.character_speed = 85 * 0.001
 
@@ -31,6 +32,10 @@ class Character:
 		self.bullet_height = 8
 		self.bullet_damage = 10
 		self.bullet_color = (55, 113, 114)
+
+	# Changes health by value
+	def _change_health(self, value):
+		self.health += value
 
 	# Updates character's states
 	def update(self):

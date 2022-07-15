@@ -10,8 +10,6 @@ from text import Text
 
 '''
 ### TODO:
-### Program witch's attacks 
-### Program collision of witch's attacks
 ### Different levels based on witch's HP
 ### Program different attack types based on witch's levels
 ### Game ending
@@ -37,7 +35,7 @@ class TouhouBootleg:
 
 		# Initialize Character
 		self.character = Character(self)
-		# Initialize Drawn Bullets
+		# Initialize Drawn Player's Bullets
 		self.bullets = pygame.sprite.Group()
 		# Initialize Witch
 		self.witch = Witch(self)
@@ -80,7 +78,7 @@ class TouhouBootleg:
 			if event.key == pygame.K_s:
 				self.character.moving_south = True
 			if event.key == pygame.K_SPACE:
-				self._fire_bullet()
+				self._fire_bullet(self.character, 3)
 
 	def _keyup_events(self, event):
 		if event.key == pygame.K_d:
@@ -92,25 +90,30 @@ class TouhouBootleg:
 		if event.key == pygame.K_s:
 			self.character.moving_south = False
 
-	def _fire_bullet(self):
-		new_bullet = Bullet(self)
+	def _fire_bullet(self, owner, direction):
+		new_bullet = Bullet(self, owner, direction)
 		self.bullets.add(new_bullet)
 
 	def _update_bullets(self):
 		self.bullets.update()
-
 		for bullet in self.bullets.copy():
-			self._check_collisions(bullet)
+			self._check_collisions(bullet, bullet.owner)
 			self._check_out_of_bound(bullet)
 
-	def _check_collisions(self, bullet):
-		collision = bullet.rect.colliderect(self.witch.rect)
-		if collision:
-			self.witch._change_health(-self.character.bullet_damage)
-			self.bullets.remove(bullet)
+	def _check_collisions(self, bullet, owner):
+		if owner == self.witch:
+			collision = bullet.rect.colliderect(self.character.rect)
+			if collision:
+				self.character._change_health(-self.character.bullet_damage)
+				self.bullets.remove(bullet)
+		else:
+			collision = bullet.rect.colliderect(self.witch.rect)
+			if collision:
+				self.witch._change_health(-self.character.bullet_damage)
+				self.bullets.remove(bullet)
 
 	def _check_out_of_bound(self, bullet):
-		if bullet.rect.bottom <= 0:
+		if bullet.rect.bottom <= 0 or bullet.rect.top > self.screen.get_rect().bottom:
 			self.bullets.remove(bullet)
 
 	def _update_screen(self):
